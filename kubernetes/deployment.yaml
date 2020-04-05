@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: fah-entrypoint
+  name: fah-entrypoint
+  namespace: default
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: fah-entrypoint
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: fah-entrypoint
+    spec:
+      containers:
+        - env:
+            - name: USERNAME
+              valueFrom:
+                configMapKeyRef:
+                  key: USERNAME
+                  name: fah-entrypoint-config-132k
+            - name: TEAM
+              valueFrom:
+                configMapKeyRef:
+                  key: TEAM
+                  name: fah-entrypoint-config-132k
+            - name: PASSKEY
+              valueFrom:
+                configMapKeyRef:
+                  key: PASSKEY
+                  name: fah-entrypoint-config-132k
+          image: gcr.io/solid-feat-201308/github.com/olivieradam/p4c970
+          imagePullPolicy: Always
+          name: p4c970-1
+---
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  labels:
+    app: fah-entrypoint
+  name: fah-entrypoint-hpa-rncd
+  namespace: default
+spec:
+  maxReplicas: 5
+  metrics:
+    - resource:
+        name: cpu
+        targetAverageUtilization: 80
+      type: Resource
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: fah-entrypoint
+

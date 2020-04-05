@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: folding
+  name: folding
+  namespace: default
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: folding
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: folding
+    spec:
+      containers:
+        - env:
+            - name: USERNAME
+              valueFrom:
+                configMapKeyRef:
+                  key: USERNAME
+                  name: folding-config-o4xe
+            - name: TEAM
+              valueFrom:
+                configMapKeyRef:
+                  key: TEAM
+                  name: folding-config-o4xe
+            - name: PASSKEY
+              valueFrom:
+                configMapKeyRef:
+                  key: PASSKEY
+                  name: folding-config-o4xe
+          image: gcr.io/solid-feat-201308/github_olivieradam_p4c970
+          imagePullPolicy: IfNotPresent
+          name: github-olivieradam-p4c970-sha256-1
+---
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  labels:
+    app: folding
+  name: folding-hpa-las1
+  namespace: default
+spec:
+  maxReplicas: 5
+  metrics:
+    - resource:
+        name: cpu
+        targetAverageUtilization: 80
+      type: Resource
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: folding
+

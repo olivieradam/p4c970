@@ -31,9 +31,3 @@ ADD --chown=fahclient:root entrypoint.sh /home/root/
 RUN chmod 751 /home/root/entrypoint.sh
 
 ENTRYPOINT [ "/home/root/entrypoint.sh" ]
-
-#WORKDIR /var/lib/fahclient
-#CMD	["/usr/bin/FAHClient", \
-#	"--config", "/etc/fahclient/config.xml", \
-#	"--config-rotate=false", \
-#	"--pid-file=/var/run/fahclient.pid"]
